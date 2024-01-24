@@ -1,21 +1,21 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
-import collection from "./dbconn.js";
+import collection from "./dbconn";
 import { ObjectId } from "mongodb";
 
-const app = express();
+const app: any = express();
 
-app.use(cors());
+app.use(cors<Request>());
 app.use(express.json());
 
 //Get Tasks
-app.get("/api/tasks", async (req, res) => {
+app.get("/api/tasks", async (req: Request, res: Response) => {
   let results = await collection.find({}).toArray();
   res.send(results).status(200);
 });
 
 //Edit a Task
-app.put("/api/tasks/:_id", async (req, res) => {
+app.put("/api/tasks/:_id", async (req: Request, res: Response) => {
   const { name, checked } = req.body.task;
   console.log(req.params);
   const query = { _id: new ObjectId(req.params._id) };
@@ -31,7 +31,7 @@ app.put("/api/tasks/:_id", async (req, res) => {
 });
 
 //Upload a Task
-app.post("/api/tasks", async (req, res) => {
+app.post("/api/tasks", async (req: Request, res: Response) => {
   const { name, checked } = req.body.task;
   const update = {
     name: name,
@@ -43,7 +43,7 @@ app.post("/api/tasks", async (req, res) => {
 });
 
 //Delete a Task
-app.delete("/api/tasks/:id", async (req, res) => {
+app.delete("/api/tasks/:id", async (req: Request, res: Response) => {
   const query = { _id: new ObjectId(req.params.id) };
 
   let response = await collection.deleteOne(query);
@@ -54,3 +54,5 @@ app.delete("/api/tasks/:id", async (req, res) => {
 app.listen(5000, () => {
   console.log("App listening on 5000");
 });
+
+export { app };
