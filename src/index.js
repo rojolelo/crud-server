@@ -10,14 +10,17 @@ app.use(express.json());
 
 //Get Tasks
 app.get("/api/tasks", async (req, res) => {
-  let results = await collection.find({}).toArray();
-  res.send(results).status(200);
+  try {
+    let results = await collection.find({}).toArray();
+    res.send(results).status(200);
+  } catch (e) {
+    res.status(500).send(e);
+  }
 });
 
 //Edit a Task
 app.put("/api/tasks/:_id", async (req, res) => {
   const { name, checked } = req.body.task;
-  console.log(req.params);
   const query = { _id: new ObjectId(req.params._id) };
   const update = {
     $set: {
@@ -25,9 +28,12 @@ app.put("/api/tasks/:_id", async (req, res) => {
       checked,
     },
   };
-  let response = await collection.updateOne(query, update);
-  console.log(response);
-  res.sendStatus(200);
+  try {
+    await collection.updateOne(query, update);
+    res.sendStatus(200);
+  } catch (e) {
+    res.status(500).send(e);
+  }
 });
 
 //Upload a Task
@@ -37,18 +43,25 @@ app.post("/api/tasks", async (req, res) => {
     name: name,
     checked: checked,
   };
-  let response = await collection.insertOne(update);
-  console.log(response);
-  res.status(200).send(response);
+
+  try {
+    let response = await collection.insertOne(update);
+    res.status(200).send(response);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 //Delete a Task
 app.delete("/api/tasks/:id", async (req, res) => {
   const query = { _id: new ObjectId(req.params.id) };
 
-  let response = await collection.deleteOne(query);
-  console.log(response);
-  res.sendStatus(200);
+  try {
+    await collection.deleteOne(query);
+    res.sendStatus(200);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 app.listen(5000, () => {

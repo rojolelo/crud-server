@@ -1,5 +1,9 @@
 import { MongoClient } from "mongodb";
-const uri = "mongodb+srv://ronny:1Y1HnECGCtQUvdnx@cluster0.cd8s9aq.mongodb.net/?retryWrites=true&w=majority"
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+const uri = process.env.MONGOURI;
 const client = new MongoClient(uri);
 let conn;
 let db;
@@ -8,7 +12,7 @@ try {
   conn = await client.connect();
   db = await conn.db("tasks");
   collection = db.collection("taskscoll");
-} catch(e) {
+} catch (e) {
   console.error(e);
 }
 export default collection;
