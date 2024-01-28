@@ -2,14 +2,23 @@ import express from "express";
 import cors from "cors";
 import collection from "./dbconn.js";
 import { ObjectId } from "mongodb";
+import { auth } from "express-oauth2-jwt-bearer";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
+
+const checkkJwt = auth({
+  audience: "crudtasks",
+  issuerBaseURL: "https://dev-sdj0osds.auth0.com",
+});
 
 app.use(cors());
 app.use(express.json());
 
 //Get Tasks
-app.get("/api/tasks", async (req, res) => {
+app.get("/api/tasks", checkkJwt, async (req, res) => {
   try {
     let results = await collection.find({}).toArray();
     res.send(results).status(200);
@@ -19,7 +28,7 @@ app.get("/api/tasks", async (req, res) => {
 });
 
 //Edit a Task
-app.put("/api/tasks/:_id", async (req, res) => {
+app.put("/api/tasks/:_id", checkkJwt, async (req, res) => {
   const { name, checked } = req.body.task;
   const query = { _id: new ObjectId(req.params._id) };
   const update = {
@@ -37,7 +46,7 @@ app.put("/api/tasks/:_id", async (req, res) => {
 });
 
 //Upload a Task
-app.post("/api/tasks", async (req, res) => {
+app.post("/api/tasks", checkkJwt, async (req, res) => {
   const { name, checked } = req.body.task;
   const update = {
     name: name,
@@ -53,7 +62,7 @@ app.post("/api/tasks", async (req, res) => {
 });
 
 //Delete a Task
-app.delete("/api/tasks/:id", async (req, res) => {
+app.delete("/api/tasks/:id", checkkJwt, async (req, res) => {
   const query = { _id: new ObjectId(req.params.id) };
 
   try {
